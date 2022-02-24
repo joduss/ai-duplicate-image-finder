@@ -34,7 +34,7 @@ class AugmentedDatasetBuilder(DatasetBuilder):
 
 
     def __init__(self, source_path: str, dest_path: str, max_img_dim: int = 512,
-                 augmentation_per_img: int = 2, ratio_area_same: float = 0.5, angle_same: int = 20):
+                 augmentation_per_img: int = 2, ratio_area_same: float = 0.6, angle_same: int = 10):
         """
         :param source_path:
         :param dest_path:
@@ -56,13 +56,24 @@ class AugmentedDatasetBuilder(DatasetBuilder):
         os.makedirs(augmented_image_dir, exist_ok=True)
 
         for i in range(self.augmentation_per_img):
-            augmented_image, angle = self.rotate(image)
-            augmented_image, ratio = self.crop(augmented_image)
-            augmented_image = self.resize_image(augmented_image)
+            rand = random.uniform(0, 8)
+
+            angle = 0
+            ratio = 1
+
+            if rand < 1:
+                augmented_image, angle = self.rotate(image)
+                augmented_image, ratio = self.crop(augmented_image)
+            elif rand < 4.5:
+                augmented_image, ratio = self.crop(image)
+            else:
+                augmented_image, angle = self.rotate(image)
 
             augmented_image_path = self.generate_image_path(original_image_path=image_path,
                                                             to_append=str(i),
                                                             target_dir=augmented_image_dir)
+
+            augmented_image = self.resize_image(augmented_image)
             self.save_image(augmented_image, augmented_image_path)
 
             self.augmented_pairs.append(
@@ -97,7 +108,8 @@ class AugmentedDatasetBuilder(DatasetBuilder):
 
 
     def rotate(self, image: np.ndarray) -> (np.ndarray, float):
-        angle = random.uniform(0, 2 * self.angle_same)
+        angle = random.uniform(-2 * self.angle_same, 2 * self.angle_same)
+
         img_center = (image.shape[1] // 2, image.shape[0] // 2)
         rotation_mtx = cv2.getRotationMatrix2D(img_center, angle, 1)
         rotated_image = cv2.warpAffine(image, rotation_mtx, (image.shape[1], image.shape[0]), flags=cv2.INTER_LINEAR)
