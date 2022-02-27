@@ -9,12 +9,11 @@ from random import shuffle
 import cv2
 import numpy as np
 from tqdm import tqdm
-from itertools import cycle
 import pyheif
 from PIL import Image
 
 # PARSING ARGUMENTS
-from data.dataset.dataset_v1 import Dataset
+from data.dataset.loader import Dataset
 from data.dataset.image_pair import ImagePair
 
 parser = argparse.ArgumentParser(description='Build dataset from local all_images.')
@@ -77,8 +76,7 @@ class DatasetBuilder:
 
         dataset = Dataset(images=images, image_pairs=self._create_image_pairs(images) + augmented_pairs)
 
-        with open(f"{dataset_dir}/dataset", mode="wb") as dataset_file:
-            pickle.dump(dataset, dataset_file)
+        dataset.to_dataframe().to_csv(f"{dataset_dir}/dataset")
 
 
     def process_images(self, images: list[str], target_dir: str) -> list[ImagePair]:
