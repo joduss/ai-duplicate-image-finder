@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from PIL.Image import Image
 from PIL.ImageOps import exif_transpose
 
-from data.dataset.image_pair import ImagePair
+from src.data.dataset.image_pair import ImagePair
 
 
 def resize(image: Image, max_length: int) -> Image:
@@ -53,7 +53,7 @@ def plot_n(image_pairs: list[ImagePair], predicted_similarities: list[bool] = No
 
 def plot(rows: int, cols: int, images: list[Image], titles: list[str], fig_size_multiplier: float = 1):
     """
-    Plots images with the given titles in a grid.
+    Plots images with the given titles in print_loaded_image_name_tf grid.
     :param rows:
     :param cols:
     :param images:
