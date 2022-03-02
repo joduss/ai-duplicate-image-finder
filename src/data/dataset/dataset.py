@@ -27,6 +27,10 @@ class Dataset:
         return pd.DataFrame(array)
 
 
+    def similarities(self):
+        return list(map(lambda pair: pair.similar, self.image_pairs))
+
+
     @staticmethod
     def from_dataframe(dataframe: pd.DataFrame) -> Dataset:
         all_images = set()
