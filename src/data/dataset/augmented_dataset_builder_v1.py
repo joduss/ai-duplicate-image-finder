@@ -7,8 +7,8 @@ import cv2
 import numpy as np
 
 # PARSING ARGUMENTS
-from data.dataset.dataset_builder import DatasetBuilder
-from data.dataset.image_pair import ImagePair
+from src.data.dataset.dataset_builder import DatasetBuilder
+from src.data.dataset.image_pair import ImagePair
 
 parser = argparse.ArgumentParser(description='Build dataset from local all_images.')
 parser.add_argument('input', type=str, help='Directory to scan for pictures')
@@ -39,7 +39,7 @@ class AugmentedDatasetBuilder(DatasetBuilder):
         :param source_path:
         :param dest_path:
         :param augmentation_per_img:
-        :param ratio_area_same: If we have 2 images, the second being a cropped area of the second one,
+        :param ratio_area_same: If we have 2 images, the second being print_loaded_image_name_tf cropped area of the second one,
                                     until what ratio is it still considered the same image?
         :param angle_same: Angle until which we consider an image to be similar.
         """

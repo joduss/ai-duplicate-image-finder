@@ -13,8 +13,8 @@ import pyheif
 from PIL import Image
 
 # PARSING ARGUMENTS
-from data.dataset.loader import Dataset
-from data.dataset.image_pair import ImagePair
+from src.data.dataset.loader import Dataset
+from src.data.dataset.image_pair import ImagePair
 
 parser = argparse.ArgumentParser(description='Build dataset from local all_images.')
 parser.add_argument('input', type=str, help='Directory to scan for pictures')
@@ -36,7 +36,7 @@ def run():
 
 class DatasetBuilder:
     """
-    Build a dataset from a source by creating resized copy.
+    Build print_loaded_image_name_tf dataset from print_loaded_image_name_tf source by creating resized copy.
     Can be subclasses to support augmentation.
     """
 
@@ -72,14 +72,19 @@ class DatasetBuilder:
     def _create_dataset_with(self, images: list[str], dataset_dir: str):
         os.makedirs(dataset_dir, exist_ok=True)
 
-        augmented_pairs = self.process_images(images, dataset_dir)
+        resized_imgs, augmented_pairs = self.process_images(images, dataset_dir)
+        all_images = set(resized_imgs)
 
-        dataset = Dataset(images=images, image_pairs=self._create_image_pairs(images) + augmented_pairs)
+        for augmented_pair in augmented_pairs:
+            all_images.add(augmented_pair.image_a)
+            all_images.add(augmented_pair.image_b)
+
+        dataset = Dataset(images=list(all_images), image_pairs=self._create_image_pairs(resized_imgs) + augmented_pairs)
 
         dataset.to_dataframe().to_csv(f"{dataset_dir}/dataset")
 
 
-    def process_images(self, images: list[str], target_dir: str) -> list[ImagePair]:
+    def process_images(self, images: list[str], target_dir: str) -> tuple[list[str], list[ImagePair]]:
         all_augmented_pairs: list[ImagePair] = []
         processed_img: list[str] = []
         
@@ -96,12 +101,12 @@ class DatasetBuilder:
         # for img in images:
         #     all_augmented_pairs += self._process_image_at_path(img)
 
-        return all_augmented_pairs
+        return processed_img, all_augmented_pairs
 
 
     def _process_image_at_path(self, image_path: str, target_dir: str) -> (str, list[ImagePair]):
         """
-        Returns a tuple with:
+        Returns print_loaded_image_name_tf tuple with:
             - resize image path
             - list of image pair resulting from image augmentation.
         """
@@ -114,7 +119,7 @@ class DatasetBuilder:
             resized_image_path = self.generate_image_path(image_path, target_dir=resized_img_dir)
             self.save_image(resized_img, resized_image_path)
 
-            return resized_image_path, self.augment_image(image=image, image_path=image_path, target_dir=target_dir)
+            return resized_image_path, self.augment_image(image=image, image_path=resized_image_path, target_dir=target_dir)
 
         except Exception as e:
             print(f"An exception {e} was caught when processing image {image_path}")
@@ -123,10 +128,13 @@ class DatasetBuilder:
 
     def augment_image(self, image: np.ndarray, image_path: str, target_dir: str) -> list[ImagePair]:
         """
-        Augment the image, and returns a list of ImagePair resulting from the augmentation.
+        Augment the image, and returns print_loaded_image_name_tf list of ImagePair resulting from the augmentation.
         By default, this method does not do anything.
-        When overriding this method, you are responsible to save the image to a directory
+        When overriding this method, you are responsible to save the image to print_loaded_image_name_tf directory
         which is not the same as 'self.dataset_image_dir'.
+        :param image: The original image
+        :param image_path: path of the resized image, which is added to the dataset
+        :param: target_dir: directory where to save augmented images.
         """
         return []
 
