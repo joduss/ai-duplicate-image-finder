@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from data.dataset.image_pair import ImagePair
+from src.data.dataset.image_pair import ImagePair
 import pandas as pd
 
 
@@ -39,8 +39,8 @@ class Dataset:
             pairs.append(ImagePair(
                 image_a=row["image_a"],
                 image_b=row["image_b"],
-                similar=row["similar"],
-                augmented=row["augmented"]
+                similar=bool(row["similar"]),
+                augmented=bool(row["augmented"])
             ))
 
         return Dataset(images=list(all_images), image_pairs=pairs)

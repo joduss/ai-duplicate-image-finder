@@ -1,9 +1,7 @@
 import pickle
 
 import pandas as pd
-
-from data.dataset.dataset import Dataset
-
+from src.data.dataset.dataset import Dataset
 
 
 def load_train_v1() -> Dataset:
