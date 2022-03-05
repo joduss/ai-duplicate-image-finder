@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.data import AUTOTUNE
 
 from src.data.dataset.dataset import Dataset
 from src.data.dataset.image_shape import ImageShape
@@ -33,6 +32,7 @@ class TfDatasetTransformer():
 
     def print_loaded_image_name_tf(self, image_a_path: tf.Tensor, image_b_path: tf.Tensor, similar: tf.Tensor):
         return tf.py_function(self.print_loaded_image_name, [image_a_path, image_b_path, similar], Tout=[image_a_path.dtype, image_a_path.dtype, similar.dtype])
+
 
     def print_loaded_image_name(self, image_a_path: tf.Tensor, image_b_path: tf.Tensor, similar: tf.Tensor):
         print(image_a_path, end='\r')
