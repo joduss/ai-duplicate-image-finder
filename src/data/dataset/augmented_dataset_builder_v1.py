@@ -79,7 +79,8 @@ class AugmentedDatasetBuilder(DatasetBuilder):
             self.augmented_pairs.append(
                 ImagePair(image_a=image_path,
                           image_b=augmented_image_path,
-                          similar=angle <= self.angle_same and ratio >= self.ratio_area_same)
+                          similar=angle <= self.angle_same and ratio >= self.ratio_area_same,
+                          augmented=True)
             )
 
         return self.augmented_pairs
