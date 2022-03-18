@@ -5,7 +5,7 @@ import pandas as pd
 
 
 class Dataset:
-    BASE_PATH = "data/dataset_v1"
+    BASE_PATH = "./data/dataset_v1"
 
 
     def __init__(self, images: list[str], image_pairs: list[ImagePair]):
