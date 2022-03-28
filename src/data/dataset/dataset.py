@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import random
+
 from src.data.dataset.image_pair import ImagePair
 import pandas as pd
 
@@ -11,6 +13,10 @@ class Dataset:
     def __init__(self, images: list[str], image_pairs: list[ImagePair]):
         self.all_images = images
         self.image_pairs = image_pairs
+
+
+    def shuffle_pairs(self):
+        random.shuffle(self.image_pairs)
 
 
     def to_dataframe(self):

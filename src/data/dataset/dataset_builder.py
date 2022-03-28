@@ -80,6 +80,7 @@ class DatasetBuilder:
             all_images.add(augmented_pair.image_b)
 
         dataset = Dataset(images=list(all_images), image_pairs=self._create_image_pairs(resized_imgs) + augmented_pairs)
+        dataset.shuffle_pairs()
 
         dataset.to_dataframe().to_csv(f"{dataset_dir}/dataset")
 
