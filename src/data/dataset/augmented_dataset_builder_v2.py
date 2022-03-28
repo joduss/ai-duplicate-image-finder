@@ -34,7 +34,7 @@ class AugmentedDatasetBuilder(DatasetBuilder):
 
 
     def __init__(self, source_path: str, dest_path: str, max_img_dim: int = 512,
-                 augmentation_per_img: int = 2, ratio_area_same: float = 0.6, angle_same: int = 5):
+                 augmentation_per_img: int = 2, ratio_area_same: float = 0.7, angle_same: int = 10):
         """
         :param source_path:
         :param dest_path:

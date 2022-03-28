@@ -1,19 +1,17 @@
-import pickle
-
 import pandas as pd
 from src.data.dataset.dataset import Dataset
 
 
 def load_train_v1() -> Dataset:
-    return _load(f"{Dataset.BASE_PATH}/train-dataset/dataset")
+    return _load(f"./data/dataset_v1/train-dataset/dataset")
 
 
 def load_validation_v1() -> Dataset:
-    return _load(f"{Dataset.BASE_PATH}/validation-dataset/dataset")
+    return _load(f"./data/dataset_v1/validation-dataset/dataset")
 
 
 def load_test_v1() -> Dataset:
-    return _load(f"{Dataset.BASE_PATH}/test-dataset/dataset")
+    return _load(f"./data/dataset_v1/test-dataset/dataset")
 
 
 

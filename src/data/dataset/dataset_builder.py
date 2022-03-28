@@ -13,7 +13,7 @@ import pyheif
 from PIL import Image
 
 # PARSING ARGUMENTS
-from src.data.dataset.loader import Dataset
+from src.data.dataset.dataset_v1_loader import Dataset
 from src.data.dataset.image_pair import ImagePair
 
 parser = argparse.ArgumentParser(description='Build dataset from local all_images.')
