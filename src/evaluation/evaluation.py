@@ -3,6 +3,7 @@ from typing import Iterable
 import numpy as np
 import tensorflow.keras as k
 import sklearn.metrics as skm
+from matplotlib import pyplot as plt
 from tensorflow.python.data import AUTOTUNE
 
 from src.data.dataset.dataset import Dataset
@@ -29,16 +30,35 @@ class Evaluation:
             self._predictions = self.model.predict(self.tf_dataset, workers=workers, max_queue_size=20, verbose=1)
 
 
-    def evaluate_metrics(self, threshold=0.5, workers=8):
-        self._classify()
-        print(skm.classification_report(self.dataset.similarities(), self._predictions >= threshold))
+    def print_f1_report(self, threshold=0.5, workers=8):
+        self._classify(workers=workers)
+        print(skm.classification_report(self.dataset.similarities(), self._predictions >= threshold, zero_division=0))
 
 
-    def evaluate_metrics_augmentation_separated(self, threshold=0.5):
-        self._classify()
+    def plot_roc(self, workers=8):
+        self._classify(workers=workers)
+        fpr, tpr, thresholds = skm.roc_curve(self.dataset.similarities(), self._predictions)
+        roc_auc = skm.auc(fpr, tpr)
+        display = skm.RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=roc_auc, estimator_name="All")
+        display.plot()
+        plt.show()
 
-        idx_pairs_augmented = [(i, pair) for i,pair in enumerate(self.dataset.image_pairs) if pair.augmented]
-        idx_pairs_regular = [(i, pair) for i,pair in enumerate(self.dataset.image_pairs) if not pair.augmented]
+
+    def print_separate_f1_reports(self, threshold=0.5, workers=8):
+        self._classify(workers=workers)
+
+        regular_true, regular_predictions, augmented_true, augmented_predictions = self._regular_augmented_plit()
+
+        print("Regular pairs:")
+        print(skm.classification_report(regular_true, regular_predictions >= threshold, zero_division=0))
+
+        print("Augmented pairs:")
+        print(skm.classification_report(augmented_true, augmented_predictions >= threshold, zero_division=0))
+
+
+    def _regular_augmented_plit(self):
+        idx_pairs_augmented = [(i, pair) for i, pair in enumerate(self.dataset.image_pairs) if pair.augmented]
+        idx_pairs_regular = [(i, pair) for i, pair in enumerate(self.dataset.image_pairs) if not pair.augmented]
 
         idx_augm_pairs, augmented_pairs = zip(*idx_pairs_augmented)
         idx_regular_pairs, regular_pairs = zip(*idx_pairs_regular)
@@ -51,15 +71,10 @@ class Evaluation:
         augmented_true = list(map(lambda pair: pair.similar, augmented_pairs))
         regular_true = list(map(lambda pair: pair.similar, regular_pairs))
 
-        print("Regular pairs:")
-        print(skm.classification_report(regular_true, regular_predictions >= threshold))
+        return regular_true, regular_predictions, augmented_true, augmented_predictions
 
-        print("Augmented pairs:")
-        print(skm.classification_report(augmented_true, augmented_predictions >= threshold))
-
-
-    def show_images(self, range: Iterable, threshold=0.5):
-        self._classify()
+    def show_images(self, range: Iterable, threshold=0.5, image_size_factor=1, workers=8):
+        self._classify(workers=workers)
 
         similarities = self.dataset.similarities()
 
@@ -79,4 +94,4 @@ class Evaluation:
                 titles.append(f"WRONG. Images are similar. Pred sim: {similarity_pred}")
 
 
-        ipl.plot(image_pairs, titles=titles)
+        ipl.plot(image_pairs, titles=titles, fig_size_multiplier=image_size_factor)
