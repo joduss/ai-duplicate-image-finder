@@ -8,12 +8,18 @@ from src.data.dataset.image_shape import ImageShape
 
 
 class TfDatasetTransformer():
+    """
+    Images are not processed by default.
+    they may be rescaled in [-1;0] interval if rescale=True
+    """
 
-    def __init__(self, image_shape: ImageShape):
+    def __init__(self, image_shape: ImageShape, rescale=False):
         self.image_shape = image_shape
+        self.rescale = rescale
 
 
-    def transform_to_tf_dataset(self, dataset: Dataset, shuffle: bool = False, shuffle_buffer_size=1024) -> tf.data.Dataset:
+    def transform_to_tf_dataset(self, dataset: Dataset, shuffle: bool = False,
+                                shuffle_buffer_size=1024) -> tf.data.Dataset:
         pair_tuples = list(map(lambda pair: (pair.image_a, pair.image_b, int(pair.similar)), dataset.image_pairs))
         pair_array = np.array(pair_tuples)
 
@@ -24,19 +30,20 @@ class TfDatasetTransformer():
         if shuffle:
             tf_dataset = tf_dataset.shuffle(buffer_size=shuffle_buffer_size)
 
-        #tf_dataset = tf_dataset.map(self.print_loaded_image_name_tf)
+        # tf_dataset = tf_dataset.map(self.print_loaded_image_name_tf)
         tf_dataset = tf_dataset.map(self._parse)
 
         return tf_dataset
 
 
     def print_loaded_image_name_tf(self, image_a_path: tf.Tensor, image_b_path: tf.Tensor, similar: tf.Tensor):
-        return tf.py_function(self.print_loaded_image_name, [image_a_path, image_b_path, similar], Tout=[image_a_path.dtype, image_a_path.dtype, similar.dtype])
+        return tf.py_function(self.print_loaded_image_name, [image_a_path, image_b_path, similar],
+                              Tout=[image_a_path.dtype, image_a_path.dtype, similar.dtype])
 
 
     def print_loaded_image_name(self, image_a_path: tf.Tensor, image_b_path: tf.Tensor, similar: tf.Tensor):
         print(image_a_path, end='\r')
-        return (image_a_path, image_b_path, similar)
+        return image_a_path, image_b_path, similar
 
 
     @tf.function
@@ -46,20 +53,25 @@ class TfDatasetTransformer():
 
         return (image_a, image_b), similar
 
+
     def pr(self, a):
         print(a)
         return a
+
 
     @tf.function
     def _load_image(self, image_path: tf.Tensor) -> object:
         raw = tf.io.read_file(image_path)
         image = tf.image.decode_jpeg(raw)
 
-        # This will convert to float values in [0, 1]
-        image = tf.image.convert_image_dtype(image, tf.float32)
+        if self.rescale:
+            image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+            image = tf.multiply(image, 2)
+            image = tf.subtract(image, 1)
 
-        image = tf.image.resize_with_pad(image, target_height=self.image_shape.height,
-                                                target_width=self.image_shape.width)
+        image = tf.image.resize_with_pad(image,
+                                         target_height=self.image_shape.height,
+                                         target_width=self.image_shape.width)
         if image.shape[2] == 1:
             image = tf.repeat(image, repeats=3, axis=2)
 
