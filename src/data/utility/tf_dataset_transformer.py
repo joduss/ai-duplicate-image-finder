@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.data import AUTOTUNE
 
 from src.data.dataset.dataset import Dataset
 from src.data.dataset.image_shape import ImageShape
@@ -18,8 +19,8 @@ class TfDatasetTransformer():
         self.rescale = rescale
 
 
-    def transform_to_tf_dataset(self, dataset: Dataset, shuffle: bool = False,
-                                shuffle_buffer_size=1024) -> tf.data.Dataset:
+    def transform_to_tf_dataset(self, dataset: Dataset,
+                                shuffle_buffer_size=None, batch_size=64, cache_path=None, shuffle: bool = False) -> tf.data.Dataset:
         pair_tuples = list(map(lambda pair: (pair.image_a, pair.image_b, int(pair.similar)), dataset.image_pairs))
         pair_array = np.array(pair_tuples)
 
@@ -27,13 +28,23 @@ class TfDatasetTransformer():
             (pair_array[:, 0], pair_array[:, 1], pair_array[:, 2].astype(int))
         )
 
+        tf_dataset = tf_dataset.map(self._parse, num_parallel_calls=tf.data.AUTOTUNE, deterministic=False)
+
+        # if cache_path is not None:
+        #     tf_dataset = tf_dataset.cache(cache_path)
+
+        if shuffle == True and shuffle_buffer_size is None:
+            shuffle_buffer_size = 32
+
         if shuffle:
             tf_dataset = tf_dataset.shuffle(buffer_size=shuffle_buffer_size)
 
         # tf_dataset = tf_dataset.map(self.print_loaded_image_name_tf)
-        tf_dataset = tf_dataset.map(self._parse)
 
-        return tf_dataset
+        if batch_size is not None:
+            tf_dataset = tf_dataset.batch(batch_size)
+
+        return tf_dataset.prefetch(AUTOTUNE)
 
 
     def print_loaded_image_name_tf(self, image_a_path: tf.Tensor, image_b_path: tf.Tensor, similar: tf.Tensor):

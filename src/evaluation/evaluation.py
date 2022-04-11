@@ -16,7 +16,7 @@ class Evaluation:
 
     def __init__(self, dataset: Dataset, model: k.Model, image_shape: ImageShape):
         self.dataset = dataset
-        self.tf_dataset = TfDatasetTransformer(image_shape).transform_to_tf_dataset(dataset=dataset).batch(256).prefetch(AUTOTUNE)
+        self.tf_dataset = TfDatasetTransformer(image_shape).transform_to_tf_dataset(dataset=dataset, cache_path="./tf_cache/evaluation_dataset")
         self.model = model
         self._predictions: np.ndarray or None = None
 
