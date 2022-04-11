@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import random
 
+import numpy as np
+
 from src.data.dataset.image_pair import ImagePair
 import pandas as pd
+from PIL import Image
 
 
 class Dataset:
@@ -52,3 +55,11 @@ class Dataset:
             ))
 
         return Dataset(images=list(all_images), image_pairs=pairs)
+
+
+    def load_images(self, idx: int) -> (np.ndarray, np.ndarray, bool):
+        pair = self.image_pairs[idx]
+        img_a = Image.open(pair.image_a)
+        img_b = Image.open(pair.image_b)
+
+        return img_a, img_b, pair.similar

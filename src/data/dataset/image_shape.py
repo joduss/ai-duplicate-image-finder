@@ -8,4 +8,22 @@ class ImageShape:
         self.depth = depth
 
     def to_shape(self) -> tuple:
+        """
+        :return:(Height, width, depth)
+        """
         return (self.height, self.width, self.depth)
+
+
+    def as_tuple(self) -> tuple:
+        """
+        :return:(Height, width, depth)
+        """
+        return (self.height, self.width, self.depth)
+
+
+    @property
+    def size(self) -> tuple:
+        """
+        :return: (self.height, self.width)
+        """
+        return (self.height, self.width)
