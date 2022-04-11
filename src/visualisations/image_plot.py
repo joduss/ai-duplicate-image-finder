@@ -20,6 +20,10 @@ def resize(image: Image, max_length: int) -> Image:
     return exif_transpose(image.resize((int(width), int(height)), pilim.BILINEAR))
 
 
+def plot_pair(image_pair, predicted_similarity, fig_size_multiplier: float = 1, titles: list[str] = None):
+    plot([image_pair], predicted_similarities=[predicted_similarity], fig_size_multiplier=1, titles=None)
+
+
 def plot(image_pairs: list[ImagePair], predicted_similarities: list[bool] = None, fig_size_multiplier: float = 1, titles: list[str] = None):
     assert predicted_similarities is None or len(predicted_similarities) == len(image_pairs)
 
