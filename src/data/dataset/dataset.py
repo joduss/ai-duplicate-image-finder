@@ -57,7 +57,7 @@ class Dataset:
         return Dataset(images=list(all_images), image_pairs=pairs)
 
 
-    def load_images(self, idx: int) -> (np.ndarray, np.ndarray, bool):
+    def load_image(self, idx: int) -> (np.ndarray, np.ndarray, bool):
         pair = self.image_pairs[idx]
         img_a = Image.open(pair.image_a)
         img_b = Image.open(pair.image_b)

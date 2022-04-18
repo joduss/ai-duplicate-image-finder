@@ -12,11 +12,9 @@ class NotebookConfig:
             self.dataset_version = f"_{dataset_version}"
 
         self.model_name = model_name
-        self.model_output_path = f"./output/{self.model_name}{self.dataset_version}" if not os.getcwd().startswith(
-        "/content") else f"/content/drive/MyDrive/Colab Notebooks/image_duplicate/output/{model_name}{self.dataset_version}"
+        self.model_output_path = self._make_path(f"output/{self.model_name}{self.dataset_version}")
 
-        self.tensorboard_log_dir = f"./output/{self.model_name}{self.dataset_version}" if not os.getcwd().startswith(
-        "/content") else f"/content/drive/MyDrive/Colab Notebooks/image_duplicate/output/tensorboard/{model_name}{self.dataset_version}"
+        self.tensorboard_log_dir = self._make_path(f"output/tensorboard/{model_name}{self.dataset_version}")
 
         self.image_shape = ImageShape(height=224, width=224, depth=3)
 
@@ -25,13 +23,17 @@ class NotebookConfig:
         """
         :return: Path to the read-only model in the directory "$PROJECT_ROOT/models".
         """
-        return f"./models/{self.model_name}{self.dataset_version}" if not os.getcwd().startswith(
-            "/content") else f"/content/drive/MyDrive/Colab Notebooks/image_duplicate/models/{self.model_name}{self.dataset_version}"
+        return self._make_path(f"models/tensorflow/{self.model_name}{self.dataset_version}")
 
 
     @property
     def image_size(self) -> tuple:
         return self.image_shape.size
+
+
+    @property
+    def core_ml_path(self) -> str:
+        return self._make_path(f"models/coreml/{self.model_name}.mlmodel")
 
 
     def summary(self) -> str:
@@ -44,3 +46,15 @@ class NotebookConfig:
 
         return string_summary
 
+
+    def _make_path(self, relative_path: str) -> str:
+        if relative_path.startswith("/"):
+            relative_path = relative_path[1:]
+
+        if relative_path.startswith("./"):
+            relative_path = relative_path[2:]
+
+        path = f"./{relative_path}" if not os.getcwd().startswith(
+            "/content") else f"/content/drive/MyDrive/Colab Notebooks/image_duplicate/{relative_path}"
+
+        return path[:-1] if path.endswith("/") else path
