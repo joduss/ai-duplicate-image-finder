@@ -14,9 +14,10 @@ class TfDatasetTransformer():
     they may be rescaled in [-1;0] interval if rescale=True
     """
 
-    def __init__(self, image_shape: ImageShape, rescale=False):
+    def __init__(self, image_shape: ImageShape, rescale=False, resize=True):
         self.image_shape = image_shape
         self.rescale = rescale
+        self.resize = resize
 
 
     def transform_to_tf_dataset(self, dataset: Dataset,
@@ -80,9 +81,10 @@ class TfDatasetTransformer():
             image = tf.multiply(image, 2)
             image = tf.subtract(image, 1)
 
-        image = tf.image.resize_with_pad(image,
-                                         target_height=self.image_shape.height,
-                                         target_width=self.image_shape.width)
+        if self.resize:
+            image = tf.image.resize_with_pad(image,
+                                             target_height=self.image_shape.height,
+                                             target_width=self.image_shape.width)
         if image.shape[2] == 1:
             image = tf.repeat(image, repeats=3, axis=2)
 
