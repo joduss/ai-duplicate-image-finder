@@ -30,10 +30,13 @@ class NotebookConfig:
     def image_size(self) -> tuple:
         return self.image_shape.size
 
+    @property
+    def core_ml_part1_path(self) -> str:
+        return self._make_path(f"models/coreml/{self.model_name}_part-{1}.mlmodel")
 
     @property
-    def core_ml_path(self) -> str:
-        return self._make_path(f"models/coreml/{self.model_name}.mlmodel")
+    def core_ml_part2_path(self) -> str:
+        return self._make_path(f"models/coreml/{self.model_name}_part-{2}.mlmodel")
 
 
     def summary(self) -> str:
